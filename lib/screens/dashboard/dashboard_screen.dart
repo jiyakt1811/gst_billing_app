@@ -168,43 +168,6 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    'Recent Transactions',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Card(
-                    elevation: 2,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 5, // Show last 5 transactions
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Color(0xFF1E88E5),
-                            child: Icon(Icons.receipt, color: Colors.white),
-                          ),
-                          title: Text('Invoice #${1000 + index}'),
-                          subtitle: Text('₹${(1000 * (index + 1)).toStringAsFixed(2)}'),
-                          trailing: Text(
-                            DateTime.now()
-                                .subtract(Duration(hours: index))
-                                .toString()
-                                .substring(0, 16),
-                          ),
-                          onTap: () {
-                            // View transaction details
-                          },
-                        );
-                      },
-                    ),
-                  ),
                 ],
               ),
             ),
