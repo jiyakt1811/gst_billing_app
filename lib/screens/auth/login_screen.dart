@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../config/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       // Initialize Google Sign In
       final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId: '59339716312-aqvvs9qd8ov4ot5uf7e4ufn7kcl4vu0q.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
       );
 
       // Start the sign-in process
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E88E5),
+                      color: AppTheme.deepBlue,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -111,12 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 40),
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.email),
+                      prefixIcon: Icon(Icons.email),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -129,12 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -154,21 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
+                  GradientButton(
+                    text: 'Sign In',
                     onPressed: _isLoading ? null : _handleEmailSignIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1E88E5),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Sign In',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
+                    icon: Icons.login,
+                    isLoading: _isLoading,
                   ),
                   const SizedBox(height: 20),
                   const Row(
@@ -189,12 +180,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      side: const BorderSide(color: AppTheme.mediumBlue),
                     ),
                     icon: Image.network(
                       'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
                       height: 24,
                     ),
-                    label: const Text('Sign in with Google'),
+                    label: const Text(
+                      'Sign in with Google',
+                      style: TextStyle(color: AppTheme.mediumBlue),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Row(
