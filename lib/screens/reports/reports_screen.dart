@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'daily_sales_report_screen.dart';
+import 'monthly_sales_report_screen.dart';
+import 'gst_report_screen.dart';
+import 'product_performance_screen.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({Key? key}) : super(key: key);
@@ -17,8 +21,14 @@ class ReportsScreen extends StatelessWidget {
             context,
             'Daily Sales Report',
             Icons.calendar_today,
+            'View today\'s sales analytics',
             () {
-              // TODO: Navigate to daily sales report
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DailySalesReportScreen(),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -26,8 +36,14 @@ class ReportsScreen extends StatelessWidget {
             context,
             'Monthly Sales Report',
             Icons.calendar_month,
+            'View monthly sales performance',
             () {
-              // TODO: Navigate to monthly sales report
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MonthlySalesReportScreen(),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -35,8 +51,14 @@ class ReportsScreen extends StatelessWidget {
             context,
             'GST Report',
             Icons.receipt_long,
+            'Track GST collections',
             () {
-              // TODO: Navigate to GST report
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const GSTReportScreen(),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -44,8 +66,14 @@ class ReportsScreen extends StatelessWidget {
             context,
             'Product Performance',
             Icons.analytics,
+            'Analyze product sales metrics',
             () {
-              // TODO: Navigate to product performance report
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductPerformanceScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -57,12 +85,14 @@ class ReportsScreen extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
+    String subtitle,
     VoidCallback onTap,
   ) {
     return Card(
       elevation: 4,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -74,12 +104,25 @@ class ReportsScreen extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Icon(
