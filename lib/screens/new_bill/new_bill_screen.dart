@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/product.dart';
+import '../../providers/product_provider.dart';
 
-class NewBillScreen extends StatefulWidget {
+class NewBillScreen extends ConsumerStatefulWidget {
   const NewBillScreen({Key? key}) : super(key: key);
 
   @override
-  _NewBillScreenState createState() => _NewBillScreenState();
+  ConsumerState<NewBillScreen> createState() => _NewBillScreenState();
 }
 
-class _NewBillScreenState extends State<NewBillScreen> {
+class _NewBillScreenState extends ConsumerState<NewBillScreen> {
   final List<BillItem> _items = [];
-  final _productNameController = TextEditingController();
-  final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
-  double _selectedGSTRate = 5;
+  Product? _selectedProduct;
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    super.dispose();
+  }
 
   void _addItem() {
-    if (_productNameController.text.isEmpty ||
-        _priceController.text.isEmpty ||
-        _quantityController.text.isEmpty) {
+    if (_selectedProduct == null || _quantityController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
+        const SnackBar(content: Text('Please select a product and enter quantity')),
       );
       return;
     }
@@ -27,28 +32,35 @@ class _NewBillScreenState extends State<NewBillScreen> {
     setState(() {
       _items.add(
         BillItem(
-          name: _productNameController.text,
-          price: double.parse(_priceController.text),
+          product: _selectedProduct!,
           quantity: int.parse(_quantityController.text),
-          gstRate: _selectedGSTRate,
         ),
       );
-      _productNameController.clear();
-      _priceController.clear();
+      _selectedProduct = null;
       _quantityController.clear();
     });
   }
 
-  double _calculateTotal() {
-    return _items.fold(0, (sum, item) => sum + item.total);
+  double _calculateSubtotal() {
+    return _items.fold(0, (sum, item) => sum + (item.product.basePrice * item.quantity));
   }
 
-  double _calculateGST() {
-    return _items.fold(0, (sum, item) => sum + item.gstAmount);
+  double _calculateCGST() {
+    return _items.fold(0, (sum, item) => sum + (item.product.cgst * item.quantity));
+  }
+
+  double _calculateSGST() {
+    return _items.fold(0, (sum, item) => sum + (item.product.sgst * item.quantity));
+  }
+
+  double _calculateTotal() {
+    return _calculateSubtotal() + _calculateCGST() + _calculateSGST();
   }
 
   @override
   Widget build(BuildContext context) {
+    final products = ref.watch(productProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Bill'),
@@ -63,22 +75,23 @@ class _NewBillScreenState extends State<NewBillScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    TextField(
-                      controller: _productNameController,
+                    DropdownButtonFormField<Product>(
+                      value: _selectedProduct,
                       decoration: const InputDecoration(
-                        labelText: 'Product Name',
+                        labelText: 'Select Product',
                         border: OutlineInputBorder(),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _priceController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Price',
-                        prefixText: '₹',
-                        border: OutlineInputBorder(),
-                      ),
+                      items: products.map((product) {
+                        return DropdownMenuItem(
+                          value: product,
+                          child: Text('${product.name} (₹${product.basePrice})'),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedProduct = value;
+                        });
+                      },
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -88,25 +101,6 @@ class _NewBillScreenState extends State<NewBillScreen> {
                         labelText: 'Quantity',
                         border: OutlineInputBorder(),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<double>(
-                      value: _selectedGSTRate,
-                      decoration: const InputDecoration(
-                        labelText: 'GST Rate',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: const [
-                        DropdownMenuItem(value: 5, child: Text('5%')),
-                        DropdownMenuItem(value: 12, child: Text('12%')),
-                        DropdownMenuItem(value: 18, child: Text('18%')),
-                        DropdownMenuItem(value: 28, child: Text('28%')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedGSTRate = value!;
-                        });
-                      },
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
@@ -127,14 +121,25 @@ class _NewBillScreenState extends State<NewBillScreen> {
               itemCount: _items.length,
               itemBuilder: (context, index) {
                 final item = _items[index];
-                return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text('Qty: ${item.quantity} × ₹${item.price}'),
-                  trailing: Text(
-                    '₹${item.total.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ListTile(
+                    title: Text(item.product.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Qty: ${item.quantity} × ₹${item.product.basePrice}'),
+                        Text('GST: ${item.product.gstRate}%'),
+                        Text('CGST: ₹${(item.product.cgst * item.quantity).toStringAsFixed(2)}'),
+                        Text('SGST: ₹${(item.product.sgst * item.quantity).toStringAsFixed(2)}'),
+                      ],
+                    ),
+                    trailing: Text(
+                      '₹${(item.product.total * item.quantity).toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 );
@@ -147,8 +152,9 @@ class _NewBillScreenState extends State<NewBillScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  _buildTotalRow('Subtotal', _calculateTotal() - _calculateGST()),
-                  _buildTotalRow('GST', _calculateGST()),
+                  _buildTotalRow('Subtotal', _calculateSubtotal()),
+                  _buildTotalRow('CGST', _calculateCGST()),
+                  _buildTotalRow('SGST', _calculateSGST()),
                   const Divider(),
                   _buildTotalRow(
                     'Total',
@@ -200,18 +206,11 @@ class _NewBillScreenState extends State<NewBillScreen> {
 }
 
 class BillItem {
-  final String name;
-  final double price;
+  final Product product;
   final int quantity;
-  final double gstRate;
 
   BillItem({
-    required this.name,
-    required this.price,
+    required this.product,
     required this.quantity,
-    required this.gstRate,
   });
-
-  double get total => (price * quantity) + gstAmount;
-  double get gstAmount => (price * quantity) * (gstRate / 100);
 } 

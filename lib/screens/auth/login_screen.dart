@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -19,19 +16,45 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _handleGoogleSignIn() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      // Initialize Google Sign In
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: '59339716312-aqvvs9qd8ov4ot5uf7e4ufn7kcl4vu0q.apps.googleusercontent.com',
+      );
+
+      // Start the sign-in process
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw 'Google Sign In was cancelled';
+      }
+
+      // Get auth details from request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      // Sign in with Firebase
       await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
-      print('Error signing in with Google: $e');
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing in: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -44,7 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
           password: _passwordController.text,
         );
       } catch (e) {
-        print('Error signing in: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error signing in: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
       setState(() => _isLoading = false);
     }
@@ -139,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             'Sign In',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                   ),
                   const SizedBox(height: 20),
@@ -155,15 +183,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
-                    onPressed: _handleGoogleSignIn,
+                    onPressed: _isLoading ? null : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    icon: Image.asset(
-                      'assets/google_logo.png',
+                    icon: Image.network(
+                      'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
                       height: 24,
                     ),
                     label: const Text('Sign in with Google'),
@@ -175,12 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text("Don't have an account?"),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignupScreen(),
-                            ),
-                          );
+                          // TODO: Implement sign up navigation
                         },
                         child: const Text('Sign Up'),
                       ),

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "59339716312",
+    "project_id": "mymaf-b1901",
+    "storage_bucket": "mymaf-b1901.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59339716312:android:e78850770f85b2e57409ad",
+        "android_client_info": {
+          "package_name": "com.example.maf"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "59339716312-aqa8vih6aj3kbs8ar5lfp7tqa2fsk07q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtSxK3YLJ2axnb5XJEC7eWDdVUnyLjYU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "59339716312-aqa8vih6aj3kbs8ar5lfp7tqa2fsk07q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
