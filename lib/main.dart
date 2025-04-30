@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,23 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'TATA Retail GST Billing',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
+      theme: AppTheme.theme,
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
