@@ -112,12 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 40),
                   TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: const Icon(Icons.email),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -130,12 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: const Icon(Icons.lock),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   GradientButton(
                     text: 'Sign In',
-                    onPressed: _isLoading ? null : _handleEmailSignIn,
+                    onPressed: _isLoading ? () {} : _handleEmailSignIn,
                     icon: Icons.login,
                     isLoading: _isLoading,
                   ),
@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _handleGoogleSignIn,
+                    onPressed: _isLoading ? () {} : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
